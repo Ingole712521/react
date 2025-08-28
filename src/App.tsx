@@ -1,6 +1,7 @@
 
 import './App.css'
 import { ApiCalling } from './component/apicaliing'
+import NextForm from './component/NextForm'
 
 function App() {
  
@@ -8,6 +9,7 @@ function App() {
   return (
     <>
      <ApiCalling/>
+     <NextForm/>
     </>
   )
 }

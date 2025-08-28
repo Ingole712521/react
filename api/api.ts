@@ -1,5 +1,12 @@
 import axios from "axios";
 
+export interface Post {
+  userId?: number;
+  id?: number;
+  title?: string;
+  body?: string;
+}
+const baseURL = "https://jsonplaceholder.typicode.com";
 const api = axios.create({
   baseURL: "https://jsonplaceholder.typicode.com",
 });
@@ -16,3 +23,19 @@ export const PostData = (post: any) => {
 export const detele = (id: number) => {
   return api.delete(`/posts/${id}`);
 };
+
+export const createPost = async (post: Post): Promise<Post> => {
+  const res = await fetch(`${baseURL}/posts`, {
+    method: "POST",
+    headers: { "Content-type": "application/json" },
+    body: JSON.stringify(post),
+  });
+
+  if (!res.ok) {
+    throw new Error("failed to create a post");
+  }
+
+  return res.json();
+};
+
+
