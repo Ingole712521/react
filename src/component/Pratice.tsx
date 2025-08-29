@@ -1,10 +1,8 @@
 import { Card } from 'antd';
 import axios from 'axios';
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react';
 
-//  api : "'https://fakestoreapi.com/products'"
-
-interface Products {
+interface Product {
     id: number;
     title: string;
     price: number;
@@ -13,74 +11,47 @@ interface Products {
     rating: {
         rate: number;
         count: number;
-
-    }
-
+    };
 }
 
+const Practice = () => {
+    const [data, setData] = useState<Product[]>([]);
+    const [formData, setFormData] = useState<Partial<Product>>({
+        title: '',
+        description: '',
+    });
+    const [isLoading, setIsLoading] = useState<boolean>(false);
+    const [isCreating, setIsCreating] = useState<boolean>(false);
+    const [error, setError] = useState<string | null>(null);
+    const [response, setResponse] = useState<Product | null>(null);
 
-const Pratice = () => {
-    const [data, setData] = useState<Products[]>([])
-    const [formData, setformData] = useState<Partial<Products>>({
-        title: "",
-        description: ""
-    })
-    const [creating, setCreating] = useState<boolean>(false)
-    const [isLoading, setisLoading] = useState<boolean>(false)
-    const [error, setError] = useState<string | null>(null)
-    const [response, setResponse] = useState<Products | null>(null)
-
-
-    // fetching data 
+    // Fetching data
     const getData = async () => {
-        setisLoading(true);
+        setIsLoading(true);
         setError(null);
+
         try {
-            const response = await axios.get("https://fakestoreapi.com/products")
+            const response = await axios.get("https://fakestoreapi.com/products");
             setData(response.data);
-            console.log("Product data", response.data)
-
+            console.log("Product data", response.data);
         } catch (error) {
-            return { error }
-
+            setError("Failed to fetch products");
+            console.error(error);
         } finally {
-            setisLoading(false)
+            setIsLoading(false);
         }
-
-    }
+    };
 
     useEffect(() => {
         getData();
-    }, [])
-
+    }, []);
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-        setformData((prev) => ({
+        setFormData((prev) => ({
             ...prev,
             [e.target.name]: e.target.value,
-        }))
-
-    }
-
-
-    const createPost = async (products: Products): Promise<Products> => {
-        const response = await fetch(`https://fakestoreapi.com/products`, {
-            method: "POST",
-            headers: {
-                "Content-type": "application/json",
-            },
-            body: JSON.stringify(products),
-        })
-
-        if (!response.ok) {
-            throw new Error("Failed to Create a product");
-
-
-        }
-
-        return response.json();
-
-    }
+        }));
+    };
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -89,143 +60,135 @@ const Pratice = () => {
             setError("Title and description are required");
             return;
         }
-        setCreating(true);
+
+        setIsCreating(true);
         setError(null);
-
-
 
         try {
             const productToCreate = {
                 ...formData,
                 price: formData.price || 0,
-                description: formData.description,
-                category: formData.category,
+                category: formData.category || 'default',
                 rating: formData.rating || { rate: 0, count: 0 }
-
-            } as Products
+            } as Product;
 
             const response = await createPost(productToCreate);
             console.log(response)
             setResponse(response);
-            setisLoading(true)
-            setformData({
-                title: "",
-                description: ""
-            })
-
+            // getData(); 
+            setFormData({
+                title: '',
+                description: '',
+            });
         } catch (error) {
-            return <>{error}</>
-
+            setError("Failed to create product");
+            console.error(error);
         } finally {
-            setisLoading(false);
-            setCreating(false)
+            setIsCreating(false);
         }
+    };
 
-    }
-
-    const DeletePost = async (id: number): Promise<void> => {
-        const res = await fetch(`https://fakestoreapi.com/products/${id}`, {
-            method: "DElETE",
-
+    const createPost = async (product: Product): Promise<Product> => {
+        const response = await fetch(`https://fakestoreapi.com/products`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(product),
         });
-        if (!res.ok) {
-            throw new Error("Failed to Delete the product");
 
+        if (!response.ok) {
+            throw new Error("Failed to create a product");
         }
-        return
 
-    }
-
-    const handleDelete = async (id: number) => {
-        setisLoading(true);
-        try {
-            await DeletePost(id);
-            console.log(id);
-            setResponse(null);
-            alert(`This ${id} is deleted succesfully `)
-
-        } catch (error: any) {
-            setError(error.message || "Failed to delete")
-
-        } finally {
-            setisLoading(false)
-        }
-    }
-
-
+        return response.json();
+    };
 
     return (
-        <div>
+        <div className="p-6">
+            <h1 className="text-2xl font-bold mb-6">Products Practice</h1>
 
-            {isLoading && <p className='text-9xl '>Loading.........</p>}
-            {
-                data.map((product) => (
-                    <Card className='text-left bg-black' key={product.id}>
-                        <h1 className='text-black' >{product.id}</h1>
-                        <h2>{product.title}</h2>
-                        <h2>{product.price}</h2>
-                        <h2>{product.description}</h2>
+            {isLoading && <p className="text-lg">Loading products...</p>}
 
+            {error && <div className="text-red-500 mb-4">{error}</div>}
 
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
+                {data.map((product) => (
+                    <Card key={product.id} className="shadow-md">
+                        <h2 className="text-lg font-semibold">{product.title}</h2>
+                        <p className="text-gray-600">${product.price}</p>
+                        <p className="text-sm mt-2">{product.description.substring(0, 100)}...</p>
+                        <div className="mt-2">
+                            <span className="text-yellow-500">Rating: {product.rating.rate}</span>
+                            <span className="ml-2 text-gray-500">({product.rating.count} reviews)</span>
+                        </div>
                     </Card>
-                ))
-
-            }
-
-
-            <div className='mt-7'>
-
-
-
-                <div>
-                    <form onSubmit={handleSubmit}>
-
-                        <label htmlFor="title"> Movie Input box </label>
-                        <input type="text" name='title' placeholder='text Movie input' value={formData.title || ""} onChange={handleChange} />
-
-
-                        <label htmlFor="title"> Movie Input box </label>
-                        <input type="text" name='description' placeholder='text descrption input' value={formData.description
-                            || ""} onChange={handleChange} />
-
-                        <button type='submit'>
-                            {isLoading ? "Submitting" : "Submit"}
-
-                        </button>
-
-                        <button onClick={() => { handleDelete(response.id!) }}>
-                            {
-                                isLoading ? "Deleting.." : "Delete"
-                            }
-
-                        </button>
-                        {
-                            response && (
-                                <div>
-                                    <h3>
-                                        MOVIE CREATED
-                                    </h3>
-                                    <p>{response.title}</p>
-                                    <p>{response.description}</p>
-
-                                </div>
-                            )
-                        }
-
-                    </form>
-                </div>
-
-
+                ))}
             </div>
 
+            <div className="mt-8 p-6 border rounded-lg shadow-md">
+                <h2 className="text-xl font-semibold mb-4">Add New Product</h2>
 
+                <form onSubmit={handleSubmit} className="space-y-4">
+                    <div>
+                        <label htmlFor="title" className="block mb-1">Title</label>
+                        <input
+                            type="text"
+                            name="title"
+                            placeholder="Product title"
+                            value={formData.title || ""}
+                            onChange={handleChange}
+                            className="w-full p-2 border rounded"
+                        />
+                    </div>
+
+                    <div>
+                        <label htmlFor="description" className="block mb-1">Description</label>
+                        <textarea
+                            name="description"
+                            placeholder="Product description"
+                            value={formData.description || ""}
+                            onChange={handleChange}
+                            className="w-full p-2 border rounded"
+                            rows={3}
+                        />
+                    </div>
+
+                    <div>
+                        <label htmlFor="price" className="block mb-1">Price</label>
+                        <input
+                            type="number"
+                            name="price"
+                            placeholder="Product price"
+                            value={formData.price || ""}
+                            onChange={handleChange}
+                            className="w-full p-2 border rounded"
+                        />
+                    </div>
+
+                    <button
+                        type="submit"
+                        disabled={isCreating}
+                        className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 disabled:bg-blue-300"
+                    >
+                        {isCreating ? "Creating..." : "Create Product"}
+                    </button>
+                </form>
+
+                {response && (
+                    <div className="mt-4 p-3 bg-green-100 border border-green-400 rounded">
+                        <h3 className="font-semibold text-green-800">Product Created Successfully!</h3>
+                        <p className="mt-2">
+                            <span className="font-medium">Title:</span> {response.title}
+                        </p>
+                        <p>
+                            <span className="font-medium">Description:</span> {response.description}
+                        </p>
+                    </div>
+                )}
+            </div>
         </div>
-    )
-}
+    );
+};
 
-
-export default Pratice
-
-
-
-
+export default Practice;
