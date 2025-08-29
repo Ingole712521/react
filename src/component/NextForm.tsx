@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { createPost, type Post } from '../../api/api';
+import { createPost, DeletePost, type Post } from '../../api/api';
 
 const NextForm = () => {
 
@@ -13,14 +13,7 @@ const NextForm = () => {
             ...prev,
             [e.target.name]: e.target.value,
         }));
-
-
-
     }
-
-
-
-
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -29,7 +22,6 @@ const NextForm = () => {
             setError("Title and body are required");
             return;
         }
-
         setError(null);
         setLoading(true)
 
@@ -54,6 +46,21 @@ const NextForm = () => {
 
 
 
+    const handleDelete = async (id: number) => {
+        setLoading(true);
+        try {
+            await DeletePost(id);
+            console.log(id)
+            setResponse(null);
+            alert(`Post delete succesfully ${id}`)
+
+        } catch (error: any) {
+            setError(error.message || "Post tp delete post");
+
+        } finally {
+            setLoading(false)
+        }
+    }
 
 
     return (
@@ -80,6 +87,22 @@ const NextForm = () => {
                         </div>
                     )
                 }
+
+                {
+                    response && (
+                        <div >
+                            <h3></h3>
+                            {/* <prev>{JSON.stringify(response, null, 2)}</prev> */}
+                            <button disabled={loading} onClick={() => handleDelete(response.id!)}>
+                                {loading ? "Deleting..." : "Delete Post"}
+
+                            </button>
+                            <h3> Delete suncessfully Created succesfully</h3>
+                        </div>
+                    )
+                }
+
+
             </form>
         </div>
     )

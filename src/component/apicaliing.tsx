@@ -30,9 +30,15 @@ export const ApiCalling = () => {
         }
     };
 
+
+
+
     useEffect(() => {
         getMovieData();
     }, []);
+
+
+
 
     return (
         <>

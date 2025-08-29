@@ -38,4 +38,12 @@ export const createPost = async (post: Post): Promise<Post> => {
   return res.json();
 };
 
-
+export const DeletePost = async (id: number): Promise<void> => {
+  const res = await fetch(`${baseURL}/posts/${id}`, {
+    method: "DELETE",
+  });
+  if (!res.ok) {
+    throw new Error(`Failed to delete post: ${res.statusText}`);
+  }
+  return;
+};
