@@ -21,7 +21,11 @@ interface Products {
 
 const Pratice = () => {
     const [data, setData] = useState<Products[]>([])
-    const [formData, setformData] = useState<Partial<Products[]>>([])
+    const [formData, setformData] = useState<Partial<Products>>({
+        title: "",
+        description: ""
+    })
+    const [creating, setCreating] = useState<boolean>(false)
     const [isLoading, setisLoading] = useState<boolean>(false)
     const [error, setError] = useState<string | null>(null)
     const [response, setResponse] = useState<Products | null>(null)
@@ -30,7 +34,7 @@ const Pratice = () => {
     // fetching data 
     const getData = async () => {
         setisLoading(true);
-
+        setError(null);
         try {
             const response = await axios.get("https://fakestoreapi.com/products")
             setData(response.data);
@@ -58,26 +62,94 @@ const Pratice = () => {
 
     }
 
-    const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault()
-        if (!formData.title || !formData.description) {
-            setError("title and body are not provided")
-            return
+
+    const createPost = async (products: Products): Promise<Products> => {
+        const response = await fetch(`https://fakestoreapi.com/products`, {
+            method: "POST",
+            headers: {
+                "Content-type": "application/json",
+            },
+            body: JSON.stringify(products),
+        })
+
+        if (!response.ok) {
+            throw new Error("Failed to Create a product");
+
+
         }
 
+        return response.json();
+
+    }
+
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+
+        if (!formData.title || !formData.description) {
+            setError("Title and description are required");
+            return;
+        }
+        setCreating(true);
+        setError(null);
+
+
+
         try {
-            const response = await createPost(formData);
+            const productToCreate = {
+                ...formData,
+                price: formData.price || 0,
+                description: formData.description,
+                category: formData.category,
+                rating: formData.rating || { rate: 0, count: 0 }
+
+            } as Products
+
+            const response = await createPost(productToCreate);
             console.log(response)
             setResponse(response);
             setisLoading(true)
+            setformData({
+                title: "",
+                description: ""
+            })
 
         } catch (error) {
             return <>{error}</>
 
         } finally {
             setisLoading(false);
+            setCreating(false)
         }
 
+    }
+
+    const DeletePost = async (id: number): Promise<void> => {
+        const res = await fetch(`https://fakestoreapi.com/products/${id}`, {
+            method: "DElETE",
+
+        });
+        if (!res.ok) {
+            throw new Error("Failed to Delete the product");
+
+        }
+        return
+
+    }
+
+    const handleDelete = async (id: number) => {
+        setisLoading(true);
+        try {
+            await DeletePost(id);
+            console.log(id);
+            setResponse(null);
+            alert(`This ${id} is deleted succesfully `)
+
+        } catch (error: any) {
+            setError(error.message || "Failed to delete")
+
+        } finally {
+            setisLoading(false)
+        }
     }
 
 
@@ -120,6 +192,13 @@ const Pratice = () => {
                             {isLoading ? "Submitting" : "Submit"}
 
                         </button>
+
+                        <button onClick={() => { handleDelete(response.id!) }}>
+                            {
+                                isLoading ? "Deleting.." : "Delete"
+                            }
+
+                        </button>
                         {
                             response && (
                                 <div>
@@ -150,21 +229,3 @@ export default Pratice
 
 
 
-export const createPost = async (products: Products): Promise<Products> => {
-    const response = await fetch(`https://fakestoreapi.com/products`, {
-        method: "POST",
-        headers: {
-            "Content-type": "application/json",
-        },
-        body: JSON.stringify(products),
-    })
-
-    if (!response.ok) {
-        throw new Error("Failed to Create a product");
-
-
-    }
-
-    return response.json();
-
-}
