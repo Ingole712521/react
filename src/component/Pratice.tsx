@@ -1,6 +1,7 @@
 import { Card } from 'antd';
 import axios from 'axios';
 import React, { useEffect, useState } from 'react';
+import { DeletePost } from '../../api/api';
 
 interface Product {
     id: number;
@@ -104,6 +105,42 @@ const Practice = () => {
         return response.json();
     };
 
+
+    const DeletePost = async (id: number): Promise<void> => {
+        const response = await fetch(`https://fakestoreapi.com/products/${id}`, {
+            method: "DELETE",
+
+        });
+
+        if (!response.ok) {
+            throw new Error("failed to delete this Product")
+
+        }
+        return
+
+    }
+
+
+    const handleDelete = async (id: number) => {
+        setIsLoading(true);
+        setError(null);
+
+        try {
+            await DeletePost(id);
+            console.log(id);
+            setResponse(null);
+        } catch (error: any) {
+            console.log(error)
+
+            setError(error.message || "Failed to Delete te post")
+
+        } finally {
+            setIsLoading(false)
+        }
+
+    }
+
+
     return (
         <div className="p-6">
             <h1 className="text-2xl font-bold mb-6">Products Practice</h1>
@@ -122,6 +159,13 @@ const Practice = () => {
                             <span className="text-yellow-500">Rating: {product.rating.rate}</span>
                             <span className="ml-2 text-gray-500">({product.rating.count} reviews)</span>
                         </div>
+
+                        <button disabled={isLoading}
+                            className='text-white bg-red-500 border-2 rounded'
+                            onClick={() => { handleDelete(product.id!) }}
+                        >
+                            delete
+                        </button>
                     </Card>
                 ))}
             </div>
@@ -173,6 +217,14 @@ const Practice = () => {
                     >
                         {isCreating ? "Creating..." : "Create Product"}
                     </button>
+
+
+                    <button disabled={isLoading}
+                        className='text-white bg-red-500 border-2 rounded'
+                        onClick={() => { handleDelete(response?.id!) }}
+                    >
+                        delete
+                    </button>
                 </form>
 
                 {response && (
@@ -184,8 +236,14 @@ const Practice = () => {
                         <p>
                             <span className="font-medium">Description:</span> {response.description}
                         </p>
+
+
                     </div>
                 )}
+
+
+
+
             </div>
         </div>
     );
