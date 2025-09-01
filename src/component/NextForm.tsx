@@ -65,45 +65,48 @@ const NextForm = () => {
 
     return (
         <div>
-
-            <h2>
-                Created a POST
-            </h2>
-
-            <form onSubmit={handleSubmit}>
-                <label htmlFor=""> Title</label>
-                <input type="text" name='title' className='text-orange-300' value={formData.title} onChange={handleChange} />
-                <textarea name="body" placeholder='Enter body' value={formData.body} onChange={handleChange}></textarea>
-                <button type='submit' disabled={loading}>
-
-                    {loading ? "Submitting " : "Submit"}
-                </button>
+            <div className="p-6 justify-content-center">
 
 
-                {
-                    response && (
-                        <div >
-                            <h3> POst Created succesfully</h3>
-                        </div>
-                    )
-                }
+                <h2>
+                    Created a POST
+                </h2>
 
-                {
-                    response && (
-                        <div >
-                            <h3></h3>
-                            {/* <prev>{JSON.stringify(response, null, 2)}</prev> */}
-                            <button disabled={loading} onClick={() => handleDelete(response.id!)}>
-                                {loading ? "Deleting..." : "Delete Post"}
+                <form onSubmit={handleSubmit}>
+                    <label htmlFor=""> Title</label>
+                    <input type="text" name='title' className='text-orange-300' value={formData.title} onChange={handleChange} />
+                    <textarea name="body" placeholder='Enter body' value={formData.body} onChange={handleChange}></textarea>
+                    <button type='submit' disabled={loading}>
 
-                            </button>
-                            <h3> Delete suncessfully Created succesfully</h3>
-                        </div>
-                    )
-                }
+                        {loading ? "Submitting " : "Submit"}
+                    </button>
 
 
-            </form>
+                    {
+                        response && (
+                            <div >
+                                <h3> POst Created succesfully</h3>
+                            </div>
+                        )
+                    }
+
+                    {
+                        response && (
+                            <div >
+                                <h3></h3>
+                                {/* <prev>{JSON.stringify(response, null, 2)}</prev> */}
+                                <button disabled={loading} onClick={() => handleDelete(response.id!)}>
+                                    {loading ? "Deleting..." : "Delete Post"}
+
+                                </button>
+                                <h3> Delete suncessfully Created succesfully</h3>
+                            </div>
+                        )
+                    }
+
+
+                </form>
+            </div>
         </div>
     )
 

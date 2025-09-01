@@ -2,6 +2,7 @@ import { Card } from 'antd';
 import axios from 'axios';
 import React, { useEffect, useState } from 'react';
 import { DeletePost } from '../../api/api';
+import { useLoaderData } from 'react-router-dom';
 
 interface Product {
     id: number;
@@ -25,6 +26,10 @@ const Practice = () => {
     const [isCreating, setIsCreating] = useState<boolean>(false);
     const [error, setError] = useState<string | null>(null);
     const [response, setResponse] = useState<Product | null>(null);
+
+
+    // const {productData} = useLoaderData();
+    // console.log(produ)
 
     // Fetching data
     const getData = async () => {
@@ -142,7 +147,7 @@ const Practice = () => {
 
 
     return (
-        <div className="p-6">
+        <div className="p-6 justify-content-center">
             <h1 className="text-2xl font-bold mb-6">Products Practice</h1>
 
             {isLoading && <p className="text-lg">Loading products...</p>}
@@ -178,7 +183,7 @@ const Practice = () => {
                         <label htmlFor="title" className="block mb-1">Title</label>
                         <input
                             type="text"
-                            name="title"
+                            name="title" 
                             placeholder="Product title"
                             value={formData.title || ""}
                             onChange={handleChange}

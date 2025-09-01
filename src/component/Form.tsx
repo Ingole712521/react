@@ -66,6 +66,9 @@ const Form: React.FC<FormProps> = ({ data, setData }) => {
 
     return (
         <>
+        <div className='content-center justify-center'>
+
+      
             <form onSubmit={handleFormSubmit}>
 
                 <div>
@@ -91,7 +94,7 @@ const Form: React.FC<FormProps> = ({ data, setData }) => {
 
             </form>
 
-
+  </div>
         </>
     )
 }

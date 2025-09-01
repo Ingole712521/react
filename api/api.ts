@@ -47,3 +47,16 @@ export const DeletePost = async (id: number): Promise<void> => {
   }
   return;
 };
+
+// ProductGetData
+// https://fakestoreapi.com/products
+export const getProduct = async () => {
+  try {
+    const response = await fetch("https://fakestoreapi.com/products");
+    // const data = response.json();
+    return response
+    console.log(data);
+  } catch (error) {
+    return { error };
+  }
+};
